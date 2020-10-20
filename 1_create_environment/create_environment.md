@@ -25,3 +25,22 @@ $ aws sts get-caller-identity
 00000000000    arn:aws:iam::00000000000:user/hogehogehoge    FUGAFUGAFUGAFUGAFUGA
 $
 ```
+
+# aws-iam-authenticatorのインストール
+以下コマンドでインストール。
+```shell
+$ brew install aws-iam-authenticator
+```
+
+# eksctlをインストール
+以下コマンドでインストール。
+```shell
+$ brew tap weaveworks/tap
+$ brew install weaveworks/tap/eksctl
+$ eksctl version
+```
+
+eksctlが既にインストールされている場合は以下でアップグレードできます。
+```shell
+$ brew upgrade eksctl && brew link --overwrite eksctl
+```
