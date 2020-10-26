@@ -105,6 +105,56 @@ aws rds create-db-subnet-group \
 }
 ```
 
+# VPCセキュリティーグループを作成
+```
+aws ec2 create-security-group \
+--region ap-northeast-1 \
+--group-name DemoRDSSecurityGroup \
+--description "Demo RDS security group" \
+--vpc-id ${RDS_VPC_ID}
+
+{
+    "GroupId": "sg-0657421c415738cb4"
+}
+# Export the RDS VPC Security Group ID for easy reference in the subsequent commands
+$ export RDS_VPC_SECURITY_GROUP_ID=sg-0657421c415738cb4
+```
+
+# RDSを作成する
+
+```
+aws rds create-db-instance \
+  --region ap-northeast-1 \
+  --db-name eksdemo \
+  --db-instance-identifier eksdemo \
+  --allocated-storage 10 \
+  --db-instance-class db.t2.micro \
+  --engine mysql \
+  --engine-version "5.7.26" \
+  --master-username eksdemo \
+  --master-user-password password \
+  --no-publicly-accessible \
+  --vpc-security-group-ids ${RDS_VPC_SECURITY_GROUP_ID} \
+  --db-subnet-group-name "demodbsubnetgroup" \
+  --availability-zone ap-northeast-1a \
+  --port 3306 | jq '{DBInstanceIdentifier:.DBInstance.DBInstanceIdentifier,Engine:.DBInstance.Engine,DBName:.DBInstance.DBName,VpcSecurityGroups:.DBInstance.VpcSecurityGroups,EngineVersion:.DBInstance.EngineVersion,PubliclyAccessible:.DBInstance.PubliclyAccessible}'
+
+  # response:
+  {
+  "DBInstanceIdentifier": "eksdemo",
+  "Engine": "mysql",
+  "DBName": "eksdemo",
+  "VpcSecurityGroups": [
+    {
+      "VpcSecurityGroupId": "sg-0657421c415738cb4",
+      "Status": "active"
+    }
+  ],
+  "EngineVersion": "5.7.26",
+  "PubliclyAccessible": false
+}
+```
+
 
 
 
