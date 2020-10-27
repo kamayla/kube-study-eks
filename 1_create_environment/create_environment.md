@@ -44,3 +44,25 @@ eksctlが既にインストールされている場合は以下でアップグ�
 ```shell
 $ brew upgrade eksctl && brew link --overwrite eksctl
 ```
+
+# eksクラスターを作成する
+EC2インスタンスにSSHするための公開鍵を作成しましょう。
+```
+$ ssh-keygen
+```
+
+```
+$ eksctl create cluster \
+--name eksdemo \
+--version 1.16 \
+--region ap-northeast-1 \
+--nodegroup-name workers \
+--node-type t3.medium \
+--nodes 1 \
+--nodes-min 1 \
+--nodes-max 4 \
+--ssh-access \
+--ssh-public-key ~/.ssh/eks-demo.pem.pub \
+--managed
+
+```

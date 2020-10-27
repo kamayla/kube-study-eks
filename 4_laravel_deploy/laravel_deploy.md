@@ -155,6 +155,24 @@ aws rds create-db-instance \
 }
 ```
 
+# 異なるVPC間に橋をかける
+
+1. Peeringの作成
+VPC画面の以下のページから作成できます。
+
+「ピアリング接続の作成」ぼたんをクリックしましょう。
+<img src="../asset/img/peering.png">
+
+すると以下の画面が開きます。
+
+<img src="../asset/img/peering_create.png">
+
+リクエスタにEKSのVPCを、アクセプタにRDSのVPCをセットします。
+
+<img src="../asset/img/peering_go.png">
+リクエストの承諾をクリックしPeeringを有効にします。
+
+
 
 
 
