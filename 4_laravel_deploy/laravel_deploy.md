@@ -173,7 +173,33 @@ VPC画面の以下のページから作成できます。
 リクエストの承諾をクリックしPeeringを有効にします。
 
 
+```
+$ export VPC_PEERING_CONNECTION_ID=pcx-0b17abd479d3c0608
+```
 
+2. EKSクラスターのルートテーブルの更新
 
+```
+aws ec2 describe-route-tables --region ap-northeast-1 --filters Name="tag:Name",Values="eksctl-eksdemo-cluster/PublicRouteTable" | jq '.RouteTables[0].RouteTableId'
 
+"rtb-02a806ad287ccae09"
+
+export EKS_ROUTE_TABLE_ID=rtb-02a806ad287ccae09
+
+aws ec2 create-route --region ap-northeast-1 --route-table-id ${EKS_ROUTE_TABLE_ID} --destination-cidr-block 10.0.0.0/24 --vpc-peering-connection-id ${VPC_PEERING_CONNECTION_ID}
+
+# response:
+{
+    "Return": true
+}
+```
+
+3. RDSクラスターのルートテーブルの更新
+RDSのルートテーブルをコンソールから調べて以下のコマンドを実行
+
+```
+export RDS_ROUTE_TABLE_ID=rtb-0e8cddc7ad122de83
+
+aws ec2 create-route --region ap-northeast-1 --route-table-id ${RDS_ROUTE_TABLE_ID} --destination-cidr-block 192.168.0.0/16 --vpc-peering-connection-id ${VPC_PEERING_CONNECTION_ID}
+```
 
