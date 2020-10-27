@@ -203,3 +203,73 @@ export RDS_ROUTE_TABLE_ID=rtb-0e8cddc7ad122de83
 aws ec2 create-route --region ap-northeast-1 --route-table-id ${RDS_ROUTE_TABLE_ID} --destination-cidr-block 192.168.0.0/16 --vpc-peering-connection-id ${VPC_PEERING_CONNECTION_ID}
 ```
 
+4. 4RDSインスタンスのセキュリティグループを更新する
+
+EKSクラスターから3306ポート上のRDSインスタンスへのすべての入力トラフィックを許可します。
+
+```
+$ aws ec2 authorize-security-group-ingress --region ap-northeast-1 --group-id ${RDS_VPC_SECURITY_GROUP_ID} --protocol tcp --port 3306 --cidr 192.168.0.0/16
+
+```
+
+# テスト用のMYSQLDeploymentを作成してMYSQLへ接続チェック
+
+```
+$ kubectl apply -f debug_mysql.yaml
+```
+
+```
+$ kubectl get all
+
+NAME                                READY   STATUS    RESTARTS   AGE
+pod/mysql-client-6d5858c459-8qzj7   1/1     Running   0          5m56s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   6h34m
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/mysql-client   1/1     1            1           5m57s
+
+NAME                                      DESIRED   CURRENT   READY   AGE
+replicaset.apps/mysql-client-6d5858c459   1         1         1       5m57s
+```
+
+Pod内部へ入る
+```
+$ kubectl exec -it mysql-client-6d5858c459-8qzj7 sh
+```
+
+```
+# mysql -h eksdemo.cqyv2st56hxy.ap-northeast-1.rds.amazonaws.com -u eksdemo -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 210
+Server version: 5.7.26-log Source distribution
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+mysql>
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| eksdemo            |
+| innodb             |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+6 rows in set (0.00 sec)
+
+mysql>
+```
+
+databaseに接続できました。
